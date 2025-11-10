@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center my-5">
+  <div class="card p-5 shadow-lg border-0 rounded-4 bg-white mx-auto" style="max-width: 600px;">
+    <h1 class="mb-3 fw-bold text-success">💰 Expense Splitter</h1>
+    <p class="lead text-muted">
+      Ứng dụng giúp bạn <strong>quản lý và chia sẻ chi tiêu nhóm</strong> nhanh chóng, minh bạch và dễ sử dụng.
+    </p>
+    <hr class="my-4">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('groups.group_list') }}" class="btn btn-success btn-lg px-5">
+        👥 Vào nhóm của tôi
+      </a>
+    {% else %}
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-4">🔑 Đăng nhập</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success px-4">📝 Đăng ký</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="mt-5 text-muted">
+    <h5 class="fw-semibold mb-3">✨ Tính năng nổi bật:</h5>
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-3">
+        <div class="p-3 border rounded-3 bg-light shadow-sm">
+          📊 <strong>Theo dõi chi tiêu</strong><br>
+          Quản lý rõ ràng từng khoản trong nhóm.
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="p-3 border rounded-3 bg-light shadow-sm">
+          🤝 <strong>Chia sẻ minh bạch</strong><br>
+          Ai trả gì — mọi người đều thấy.
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="p-3 border rounded-3 bg-light shadow-sm">
+          💾 <strong>Xuất báo cáo</strong><br>
+          Dễ dàng tải Excel và quản lý lại sau.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

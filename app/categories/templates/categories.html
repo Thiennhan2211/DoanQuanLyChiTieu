@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>📂 Danh sách loại chi tiêu</h3>
+
+<a href="{{ url_for('categories.new_category') }}" class="btn btn-primary mb-3">+ Thêm loại</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Icon</th>
+        <th>Tên loại</th>
+        <th>Thao tác</th>
+    </tr>
+
+    {% for c in categories %}
+    <tr>
+        <td>{{ c.icon }}</td>
+        <td>{{ c.name }}</td>
+        <td>
+            <form method="POST" action="{{ url_for('categories.delete_category', cat_id=c.id) }}">
+                <button class="btn btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

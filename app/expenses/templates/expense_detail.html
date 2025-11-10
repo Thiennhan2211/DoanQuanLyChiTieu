@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm rounded-4 border-0">
+    <div class="card-body">
+      <h3 class="fw-bold text-success mb-4">💸 Chi tiết chi tiêu</h3>
+
+      <div class="mb-3">
+        <h5 class="text-muted">Ai đã trả tiền:</h5>
+        <p class="fw-bold text-dark">
+          <i class="bi bi-person-circle"></i> {{ expense.payer.username }}
+        </p>
+      </div>
+
+      <div class="text-center mb-3">
+        <h1 class="display-4 text-danger fw-bold" id="amountDisplay" data-base-vnd="{{ expense.base_amount_vnd }}">
+          {{ "{:,.0f}".format(expense.amount).replace(",", ".") }} {{ expense.currency }}
+        </h1>
+        <div class="mt-2">
+    <label class="me-2">Đổi sang:</label>
+    <select id="currencySelect" class="form-select d-inline-block" style="width: 160px;">
+      <option value="VND">VND</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="JPY">JPY</option>
+    </select>
+  </div>
+</div>
+
+      <div class="mb-4">
+        <h6 class="text-muted">Dành cho ai</h6>
+        <div class="list-group">
+          {% for share in expense.shares %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="bi bi-person-circle me-1"></i>
+                {{ share.user.username }}
+              </div>
+              <div class="fw-bold text-danger">
+                {{ "{:,.0f}".format(share.share_amount).replace(",", ".") }} ₫
+                {% if share.share_percent %}
+                  <span class="text-muted small">({{ share.share_percent }}%)</span>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const notifBtn = document.getElementById("notifBtn");
+  const notifBox = document.getElementById("notifBox");
+  const notifList = document.getElementById("notifList");
+
+  notifBtn.addEventListener("click", () => {
+    notifBox.style.display = notifBox.style.display === "none" ? "block" : "none";
+  });
+
+  function loadNotifications() {
+    fetch("/auth/notifications_data")
+      .then(response => response.json())
+      .then(data => {
+        notifList.innerHTML = "";
+        if (data.length === 0) {
+          notifList.innerHTML = "<p class='text-center text-muted mb-0'>Không có thông báo nào</p>";
+        } else {
+          data.forEach(n => {
+            notifList.innerHTML += `
+              <div class="border-bottom py-2 px-2">
+                <a href="${n.link}" class="text-decoration-none ${n.is_read ? 'text-muted' : 'fw-bold'}">
+                  ${n.message}
+                </a><br>
+                <small class="text-muted">${n.created_at}</small>
+              </div>`;
+          });
+        }
+      });
+  }
+
+  loadNotifications();
+  setInterval(loadNotifications, 5000); // reload mỗi 5 giây
+});
+</script>
+<script>
+  // Nếu muốn dùng API thực-time phía client, cần backend proxy; ở đây dùng tỉ giá tĩnh từ server hoặc
+  // có thể gọi /api/rate endpoint nếu bạn thêm.
+  // Tạm thời: gọi endpoint nhẹ để lấy tỷ giá VND -> currency (server có thể cung cấp).
+  async function fetchRateTo(currency){
+    if(currency === 'VND') return 1;
+    try {
+      const res = await fetch(`/expenses/get_rate/${currency}`);
+      const j = await res.json();
+      return j.rate || 1;
+    } catch (e) {
+      console.error(e);
+      return 1;
+    }
+  }
+
+  document.getElementById('currencySelect').addEventListener('change', async function(){
+    const target = this.value;
+    const baseVnd = parseFloat(document.getElementById('amountDisplay').dataset.baseVnd || document.getElementById('amountDisplay').dataset.baseVnd);
+    // Note: dataset hyphen handling in template: we set data-base-vnd. Access via dataset.baseVnd
+    const rate = await fetchRateTo(target); // rate = 1 target = VND means 1
+    // rate = 1 target (currency->VND) ; to get VND -> target: val = baseVnd / rate
+    const display = Math.round(baseVnd / rate);
+    document.getElementById('amountDisplay').innerText = display.toLocaleString('vi-VN').replace(',', '.') + ' ' + target;
+  });
+</script>
+
+      <div class="mb-3">
+        <h6 class="text-muted">Mục đích:</h6>
+        <p>{{ expense.note or "Không có ghi chú" }}</p>
+      </div>
+
+      <div class="text-muted">
+        Ngày tạo: {{ expense.date.strftime("%d/%m/%Y, %H:%M:%S") }}
+      </div>
+      <div class="text-end mt-4">
+        <a href="{{ url_for('expenses.expense_list', group_id=expense.group_id) }}" class="btn btn-outline-secondary">← Quay lại</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

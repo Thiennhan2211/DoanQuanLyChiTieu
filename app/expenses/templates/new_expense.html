@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
+      <h3 class="fw-bold text-success mb-4">💸 Thêm chi tiêu mới</h3>
+
+      <form method="POST">
+        <div class="mb-3">
+          <label class="form-label">Tên chi tiêu</label>
+          <input type="text" name="title" class="form-control" placeholder="Ví dụ: Bữa ăn tối" required>
+        </div>
+        <label>Loại chi tiêu</label>
+<select name="category_id" class="form-control">
+    <option value="">-- Chọn loại --</option>
+    {% for c in categories %}
+    <option value="{{ c.id }}">{{ c.icon }} {{ c.name }}</option>
+    {% endfor %}
+</select>
+<br>
+        <div class="mb-3">
+          <label class="form-label">Loại tiền tệ</label>
+            <select name="currency" id="currency" class="form-select">
+              <option value="VND" selected>🇻🇳 VND (₫)</option>
+              <option value="USD">🇺🇸 USD ($)</option>
+              <option value="EUR">🇪🇺 EUR (€)</option>
+              <option value="JPY">🇯🇵 JPY (¥)</option>
+            </select>
+          </div>
+
+        <div class="mb-3">
+          <label class="form-label">Tổng số tiền</label>
+          <input type="number" step="0.01" name="amount" id="amount" class="form-control" placeholder="Nhập số tiền..." required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Ai đã trả tiền?</label>
+          <select name="payer_id" class="form-select" required>
+            {% for member in members %}
+              <option value="{{ member.id }}" {% if member.id == current_user.id %}selected{% endif %}>
+                {{ member.username }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Kiểu chia</label>
+          <select name="split_type" id="split_type" class="form-select">
+            <option value="equal">Chia đều</option>
+            <option value="percent">Chia theo %</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Dành cho ai?</label>
+          {% for member in members %}
+            <div class="input-group mb-2 align-items-center">
+              <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" name="member_ids" value="{{ member.id }}" checked>
+              </div>
+              <span class="form-control">{{ member.username }}</span>
+              <input type="number" name="percent_{{ member.id }}" class="form-control percent-input" style="max-width:100px; display:none;" placeholder="%">
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Ghi chú</label>
+          <textarea name="note" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-success px-4">💾 Lưu</button>
+          <a href="{{ url_for('expenses.expense_list', group_id=group.id) }}" class="btn btn-outline-secondary">Hủy</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const notifBtn = document.getElementById("notifBtn");
+  const notifBox = document.getElementById("notifBox");
+  const notifList = document.getElementById("notifList");
+
+  notifBtn.addEventListener("click", () => {
+    notifBox.style.display = notifBox.style.display === "none" ? "block" : "none";
+  });
+
+  function loadNotifications() {
+    fetch("/auth/notifications_data")
+      .then(response => response.json())
+      .then(data => {
+        notifList.innerHTML = "";
+        if (data.length === 0) {
+          notifList.innerHTML = "<p class='text-center text-muted mb-0'>Không có thông báo nào</p>";
+        } else {
+          data.forEach(n => {
+            notifList.innerHTML += `
+              <div class="border-bottom py-2 px-2">
+                <a href="${n.link}" class="text-decoration-none ${n.is_read ? 'text-muted' : 'fw-bold'}">
+                  ${n.message}
+                </a><br>
+                <small class="text-muted">${n.created_at}</small>
+              </div>`;
+          });
+        }
+      });
+  }
+
+  loadNotifications();
+  setInterval(loadNotifications, 5000); // reload mỗi 5 giây
+});
+</script>
+
+<script>
+document.getElementById('split_type').addEventListener('change', function() {
+  const showPercent = this.value === 'percent';
+  document.querySelectorAll('.percent-input').forEach(el => {
+    el.style.display = showPercent ? 'block' : 'none';
+  });
+});
+</script>
+{% endblock %}

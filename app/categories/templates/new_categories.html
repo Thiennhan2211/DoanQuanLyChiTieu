@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>➕ Thêm Loại Chi Tiêu</h3>
+
+<form method="POST">
+    <label>Tên loại</label>
+    <input name="name" class="form-control" required>
+
+    <label>Icon (Emoji hoặc FontAwesome)</label>
+    <input name="icon" class="form-control" placeholder="🍔 hoặc fa-solid fa-car">
+
+    <br>
+    <button class="btn btn-success">Lưu</button>
+</form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-sm col-md-6 mx-auto p-4">
+    <h2 class="text-center text-success mb-4">📝 Đăng ký tài khoản</h2>
+
+    <form method="POST">
+      <div class="mb-3">
+        <label for="username" class="form-label fw-semibold">Tên người dùng</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên người dùng..." required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label fw-semibold">Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="Nhập địa chỉ email..." required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label fw-semibold">Mật khẩu</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+    </form>
+
+    <p class="text-center mt-3">
+      Đã có tài khoản?
+      <a href="{{ url_for('auth.login') }}" class="text-success fw-semibold">Đăng nhập</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
