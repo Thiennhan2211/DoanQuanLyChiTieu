@@ -1,46 +1,77 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="text-center my-5">
-  <div class="card p-5 shadow-lg border-0 rounded-4 bg-white mx-auto" style="max-width: 600px;">
-    <h1 class="mb-3 fw-bold text-success">💰 Expense Splitter</h1>
-    <p class="lead text-muted">
+
+  <!-- Hero Card -->
+  <div class="card p-5 shadow-lg border-0 rounded-4 bg-white mx-auto" style="max-width: 650px; transition: transform 0.3s;">
+    <h1 class="mb-3 fw-bold text-success" style="font-size: 2.5rem;">💰 Expense Splitter</h1>
+    <p class="lead text-muted mb-4" style="font-size: 1.15rem;">
       Ứng dụng giúp bạn <strong>quản lý và chia sẻ chi tiêu nhóm</strong> nhanh chóng, minh bạch và dễ sử dụng.
     </p>
     <hr class="my-4">
+
     {% if current_user.is_authenticated %}
-      <a href="{{ url_for('groups.group_list') }}" class="btn btn-success btn-lg px-5">
+      <a href="{{ url_for('groups.group_list') }}" class="btn btn-success btn-lg px-5 shadow-sm" 
+         style="transition: transform 0.2s;">
         👥 Vào nhóm của tôi
       </a>
     {% else %}
       <div class="d-flex justify-content-center gap-3 mt-4">
-        <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-4">🔑 Đăng nhập</a>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success px-4">📝 Đăng ký</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-4 shadow-sm" 
+           style="transition: transform 0.2s;">🔑 Đăng nhập</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-success px-4 shadow-sm" 
+           style="transition: transform 0.2s;">📝 Đăng ký</a>
       </div>
     {% endif %}
   </div>
 
+  <!-- Feature Section -->
   <div class="mt-5 text-muted">
-    <h5 class="fw-semibold mb-3">✨ Tính năng nổi bật:</h5>
-    <div class="row justify-content-center">
-      <div class="col-md-3 mb-3">
-        <div class="p-3 border rounded-3 bg-light shadow-sm">
-          📊 <strong>Theo dõi chi tiêu</strong><br>
-          Quản lý rõ ràng từng khoản trong nhóm.
+    <h5 class="fw-semibold mb-4">✨ Tính năng nổi bật:</h5>
+    <div class="row justify-content-center g-3">
+      
+      <div class="col-md-3">
+        <div class="p-4 border rounded-4 bg-light shadow-sm h-100 feature-card" 
+             style="transition: transform 0.2s, box-shadow 0.2s;">
+          <div class="fs-3 mb-2">📊</div>
+          <strong>Theo dõi chi tiêu</strong>
+          <p class="small mb-0 mt-1 text-muted">Quản lý rõ ràng từng khoản trong nhóm.</p>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="p-3 border rounded-3 bg-light shadow-sm">
-          🤝 <strong>Chia sẻ minh bạch</strong><br>
-          Ai trả gì — mọi người đều thấy.
+
+      <div class="col-md-3">
+        <div class="p-4 border rounded-4 bg-light shadow-sm h-100 feature-card" 
+             style="transition: transform 0.2s, box-shadow 0.2s;">
+          <div class="fs-3 mb-2">🤝</div>
+          <strong>Chia sẻ minh bạch</strong>
+          <p class="small mb-0 mt-1 text-muted">Ai trả gì — mọi người đều thấy.</p>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="p-3 border rounded-3 bg-light shadow-sm">
-          💾 <strong>Xuất báo cáo</strong><br>
-          Dễ dàng tải Excel và quản lý lại sau.
+
+      <div class="col-md-3">
+        <div class="p-4 border rounded-4 bg-light shadow-sm h-100 feature-card" 
+             style="transition: transform 0.2s, box-shadow 0.2s;">
+          <div class="fs-3 mb-2">💾</div>
+          <strong>Xuất báo cáo</strong>
+          <p class="small mb-0 mt-1 text-muted">Dễ dàng tải Excel và quản lý lại sau.</p>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
+<!-- Hover animation for feature cards -->
+<script>
+document.querySelectorAll('.feature-card').forEach(card => {
+  card.addEventListener('mouseover', () => {
+    card.style.transform = 'translateY(-5px)';
+    card.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+  });
+  card.addEventListener('mouseout', () => {
+    card.style.transform = 'translateY(0)';
+    card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)';
+  });
+});
+</script>
 {% endblock %}

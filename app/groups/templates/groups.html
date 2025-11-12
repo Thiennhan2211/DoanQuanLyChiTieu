@@ -1,81 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
-  <div class="card shadow-sm p-4">
-    <h2 class="text-center text-success mb-4">📋 Danh sách nhóm</h2>
+<div class="container my-5">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-success mb-1">📋 Danh sách nhóm</h2>
+        <small class="text-muted">Quản lý các nhóm chi tiêu của bạn</small>
+      </div>
+      <!-- Nút tạo nhóm duy nhất -->
+      <a href="{{ url_for('groups.group_new') }}" class="btn btn-success shadow-sm rounded-3 px-4">
+        + Tạo nhóm mới
+      </a>
+    </div>
+
     {% if groups %}
-    <div class="table-responsive">
-      <table class="table align-middle text-center">
-        <thead class="table-success">
+    <div class="table-responsive rounded-4 overflow-hidden shadow-sm">
+      <table class="table align-middle text-center mb-0">
+        <thead class="text-white" style="background: linear-gradient(90deg, #4caf50, #81c784);">
           <tr>
-            <th scope="col">Tên nhóm</th>
+            <th scope="col" class="ps-4 text-start">Tên nhóm</th>
             <th scope="col">Ngày tạo</th>
             <th scope="col">Thao tác</th>
           </tr>
         </thead>
         <tbody>
           {% for group in groups %}
-          <tr>
-            <td class="fw-semibold">{{ group.name }}</td>
+          <tr class="align-middle" style="transition: transform 0.2s;" 
+              onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            <td class="fw-semibold ps-4 text-start d-flex align-items-center">
+              <i class="bi bi-people-fill text-success me-2 fs-5"></i>
+              <a href="{{ url_for('expenses.expense_list', group_id=group.id) }}" class="text-decoration-none text-dark">
+                {{ group.name }}
+              </a>
+            </td>
             <td>{{ group.created_at.strftime('%d/%m/%Y') if group.created_at else '' }}</td>
             <td>
-              <a href="{{ url_for('expenses.expense_list', group_id=group.id) }}" class="btn btn-outline-success btn-sm">
-                Xem chi tiết
+              <a href="{{ url_for('expenses.expense_list', group_id=group.id) }}" class="btn btn-outline-success btn-sm rounded-3 me-1 shadow-sm">
+                <i class="bi bi-card-list me-1"></i> Xem
               </a>
               <form action="{{ url_for('groups.delete_group', group_id=group.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa nhóm này không?');">
-                  Xóa
+                <button type="submit" class="btn btn-outline-danger btn-sm rounded-3 shadow-sm"
+                        onclick="return confirm('Bạn có chắc muốn xóa nhóm này không?');">
+                  <i class="bi bi-trash3 me-1"></i> Xóa
                 </button>
               </form>
             </td>
           </tr>
           {% endfor %}
         </tbody>
-      <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const notifBtn = document.getElementById("notifBtn");
-  const notifBox = document.getElementById("notifBox");
-  const notifList = document.getElementById("notifList");
-
-  notifBtn.addEventListener("click", () => {
-    notifBox.style.display = notifBox.style.display === "none" ? "block" : "none";
-  });
-
-  function loadNotifications() {
-    fetch("/auth/notifications_data")
-      .then(response => response.json())
-      .then(data => {
-        notifList.innerHTML = "";
-        if (data.length === 0) {
-          notifList.innerHTML = "<p class='text-center text-muted mb-0'>Không có thông báo nào</p>";
-        } else {
-          data.forEach(n => {
-            notifList.innerHTML += `
-              <div class="border-bottom py-2 px-2">
-                <a href="${n.link}" class="text-decoration-none ${n.is_read ? 'text-muted' : 'fw-bold'}">
-                  ${n.message}
-                </a><br>
-                <small class="text-muted">${n.created_at}</small>
-              </div>`;
-          });
-        }
-      });
-  }
-
-  loadNotifications();
-  setInterval(loadNotifications, 5000); // reload mỗi 5 giây
-});
-</script>
       </table>
     </div>
     {% else %}
-    <p class="text-center text-muted mt-3">Chưa có nhóm nào. Hãy tạo nhóm mới!</p>
-    {% endif %}
-
-    <div class="text-center mt-4">
-      <a href="{{ url_for('groups.group_new') }}" class="btn btn-success px-4">+ Tạo nhóm mới</a>
+    <div class="text-center py-5">
+      <i class="bi bi-emoji-frown display-1 text-muted mb-3"></i>
+      <p class="text-muted mb-3">Chưa có nhóm nào. Hãy tạo nhóm mới!</p>
     </div>
-
+    {% endif %}
   </div>
 </div>
+
+<!-- Bootstrap Icons (nếu base.html chưa include) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 {% endblock %}

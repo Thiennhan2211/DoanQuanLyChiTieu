@@ -1,28 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container-fluid mt-4">
-  <div class="row">
-    
+  <div class="row g-4">
+
     <!-- CỘT TRÁI: CHI TIÊU -->
-    <div class="col-lg-9 col-md-8 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-success">💸 Chi tiêu trong nhóm: {{ group.name }}</h2>
+    <div class="col-lg-9 col-md-8">
+
+      <!-- Tiêu đề và nút hành động -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-success">
+          💸 Chi tiêu trong nhóm: <span class="text-dark">{{ group.name }}</span>
+        </h2>
         <div>
-          <a href="{{ url_for('expenses.expense_new', group_id=group.id) }}" class="btn btn-success me-2">+ Thêm chi tiêu</a>
-          <a href="{{ url_for('expenses.export_expenses', group_id=group.id) }}" class="btn btn-outline-primary">⬇️ Xuất Excel</a>
+          <a href="{{ url_for('expenses.expense_new', group_id=group.id) }}" class="btn btn-success shadow-sm rounded-3 me-2">
+            ➕ Thêm chi tiêu
+          </a>
+          <a href="{{ url_for('expenses.export_expenses', group_id=group.id) }}" class="btn btn-outline-success shadow-sm rounded-3">
+            ⬇️ Xuất Excel
+          </a>
         </div>
       </div>
 
       <!-- Bộ lọc -->
-      <form method="get" class="row g-2 mb-3">
+      <form method="get" class="row g-2 mb-4 bg-light p-3 rounded-4 shadow-sm">
         <div class="col-md-3">
-          <input type="date" name="from" class="form-control" placeholder="Từ ngày">
+          <input type="date" name="from" class="form-control rounded-3" placeholder="Từ ngày">
         </div>
         <div class="col-md-3">
-          <input type="date" name="to" class="form-control" placeholder="Đến ngày">
+          <input type="date" name="to" class="form-control rounded-3" placeholder="Đến ngày">
         </div>
         <div class="col-md-3">
-          <select name="user_id" class="form-select">
+          <select name="user_id" class="form-select rounded-3">
             <option value="">-- Người trả --</option>
             {% for u in group.members %}
               <option value="{{ u.id }}">{{ u.username }}</option>
@@ -30,14 +38,14 @@
           </select>
         </div>
         <div class="col-md-2">
-          <button class="btn btn-primary w-100">Lọc</button>
+          <button class="btn btn-success w-100 shadow-sm rounded-3">Lọc</button>
         </div>
       </form>
 
       <!-- Bảng chi tiêu -->
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
-          <table class="table table-hover align-middle text-center">
+          <table class="table align-middle table-hover text-center">
             <thead class="table-success">
               <tr>
                 <th>Tên chi tiêu</th>
@@ -73,18 +81,22 @@
               {% for expense in items %}
               <tr>
                 <td class="text-start">{{ expense.title }}</td>
-                <td class="text-danger fw-bold">{{ expense.amount_formatted }}</td>
+                <td class="text-danger fw-semibold">{{ expense.amount_formatted }}</td>
                 <td>{{ expense.date.strftime('%d/%m/%Y') }}</td>
                 <td>{{ expense.note or '-' }}</td>
-                <td><i class="bi bi-person-circle"></i> {{ expense.payer.username }}</td>
+                <td><i class="bi bi-person-circle text-success"></i> {{ expense.payer.username }}</td>
                 <td>
-                  <a href="{{ url_for('expenses.expense_detail', expense_id=expense.id) }}" class="btn btn-outline-info btn-sm">
+                  <a href="{{ url_for('expenses.expense_detail', expense_id=expense.id) }}" 
+                     class="btn btn-sm btn-outline-success rounded-3 shadow-sm">
                     🔍 Chi tiết
                   </a>
                   <form action="{{ url_for('expenses.delete_expense', expense_id=expense.id) }}" 
                         method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-outline-danger btn-sm"
-                            onclick="return confirm('Bạn có chắc muốn xóa chi tiêu này?');">🗑 Xóa</button>
+                    <button type="submit" 
+                            class="btn btn-sm btn-outline-danger rounded-3 shadow-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa chi tiêu này?');">
+                      🗑 Xóa
+                    </button>
                   </form>
                 </td>
               </tr>
@@ -95,106 +107,79 @@
             </tbody>
           </table>
 
-          <script>
-          document.addEventListener("DOMContentLoaded", function() {
-            const notifBtn = document.getElementById("notifBtn");
-            const notifBox = document.getElementById("notifBox");
-            const notifList = document.getElementById("notifList");
-
-            notifBtn.addEventListener("click", () => {
-              notifBox.style.display = notifBox.style.display === "none" ? "block" : "none";
-            });
-
-            function loadNotifications() {
-              fetch("/auth/notifications_data")
-                .then(response => response.json())
-                .then(data => {
-                  notifList.innerHTML = "";
-                  if (data.length === 0) {
-                    notifList.innerHTML = "<p class='text-center text-muted mb-0'>Không có thông báo nào</p>";
-                  } else {
-                    data.forEach(n => {
-                      notifList.innerHTML += `
-                        <div class="border-bottom py-2 px-2">
-                          <a href="${n.link}" class="text-decoration-none ${n.is_read ? 'text-muted' : 'fw-bold'}">
-                            ${n.message}
-                          </a><br>
-                          <small class="text-muted">${n.created_at}</small>
-                        </div>`;
-                    });
-                  }
-                });
-            }
-
-            loadNotifications();
-            setInterval(loadNotifications, 5000);
-          });
-          </script>
-
           <div class="text-end mt-3">
             <h5 class="fw-bold">
               Tổng chi tiêu:
               <span class="text-danger">
-                {{ "{:,.0f}".format(total).replace(",", ".") }} VNĐ
+                {{ "{:,.0f}".format(total).replace(",", ".") }} ₫
               </span>
             </h5>
           </div>
         </div>
       </div>
 
+      <!-- DANH SÁCH NỢ -->
       {% if debt_suggestions %}
-      <div class="card shadow-sm rounded-4 mt-4">
-        <div class="card-header bg-warning text-dark fw-bold">💰 Nợ nần </div>
-        <div class="card-body">
-          {% for d in debt_suggestions %}
-          <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+<div class="card shadow-sm rounded-4 mt-4 border-0 no-hover">
+  <div class="card-header bg-warning bg-opacity-25 fw-bold text-dark border-0">
+    💰 Nợ nần giữa các thành viên
+  </div>
+  <div class="card-body">
+    {% for d in debt_suggestions %}
+    <div class="d-flex justify-content-between align-items-center border-bottom py-3">
             <div class="d-flex align-items-center">
               <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
-                   class="rounded-circle me-2" width="40" height="40">
+                   class="rounded-circle me-2 border border-success border-2" width="42" height="42">
               <div>
                 <strong>{{ d.from.username }}</strong><br>
-                <span class="text-danger fw-bold">-{{ "{:,.0f}".format(d.amount).replace(",", ".") }} ₫</span>
+                <span class="text-danger fw-semibold">
+                  -{{ "{:,.0f}".format(d.amount).replace(",", ".") }} ₫
+                </span>
               </div>
             </div>
+
             <div class="text-center flex-grow-1">
               <i class="bi bi-arrow-right fs-4 text-secondary"></i>
             </div>
+
             <div class="d-flex align-items-center">
               <div class="text-end me-2">
                 <strong>{{ d.to.username }}</strong>
               </div>
               <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
-                   class="rounded-circle" width="40" height="40">
+                   class="rounded-circle border border-success border-2" width="42" height="42">
             </div>
 
             {% if current_user.id == d.from.id %}
-              <span class="text-muted small">(Không thể nhắc chính mình)</span>
+              <span class="text-muted small ms-2">(Không thể nhắc chính mình)</span>
             {% elif current_user.id == d.to.id %}
-              <form method="POST" action="{{ url_for('expenses.remind_payment', to_user_id=d.from.id) }}" class="d-flex ms-3">
-                <button type="button" class="btn btn-outline-success btn-sm" 
-                        data-bs-toggle="modal" data-bs-target="#paymentModal{{ d.from.id }}">
-                  💳 Nhắc thanh toán
-                </button>
+              <form method="POST" action="{{ url_for('expenses.remind_payment', to_user_id=d.from.id) }}" class="ms-3">
+        <button type="button" class="btn btn-outline-success btn-sm rounded-3 shadow-sm no-hover-btn" 
+                data-bs-toggle="modal" data-bs-target="#paymentModal{{ d.from.id }}">
+          💳 Nhắc thanh toán
+        </button>
+
+                <!-- Modal -->
                 <div class="modal fade" id="paymentModal{{ d.from.id }}" tabindex="-1" aria-labelledby="paymentModalLabel{{ d.from.id }}" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content rounded-4">
                       <div class="modal-header bg-success text-white">
-                        <h5 class="modal-title" id="paymentModalLabel{{ d.from.id }}">Nhắc {{ d.from.username }} thanh toán</h5>
+                        <h5 class="modal-title">Nhắc {{ d.from.username }} thanh toán</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                       </div>
                       <div class="modal-body">
                         <div class="mb-3">
                           <label class="form-label">Ngân hàng</label>
-                          <input type="text" name="bank_name" class="form-control" placeholder="Nhập tên ngân hàng" required>
+                          <input type="text" name="bank_name" class="form-control rounded-3" placeholder="Nhập tên ngân hàng" required>
                         </div>
                         <div class="mb-3">
                           <label class="form-label">Số tài khoản</label>
-                          <input type="text" name="bank_account" class="form-control" placeholder="Nhập số tài khoản" required>
+                          <input type="text" name="bank_account" class="form-control rounded-3" placeholder="Nhập số tài khoản" required>
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Gửi nhắc</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-success rounded-3">Gửi nhắc</button>
+                        <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Hủy</button>
                       </div>
                     </div>
                   </div>
@@ -204,7 +189,7 @@
 
             {% if current_user.id == d.to.id or current_user.id == d.from.id %}
               <form method="POST" action="{{ url_for('expenses.settle_debt', from_user_id=d.from.id, to_user_id=d.to.id, group_id=group.id) }}" class="ms-2">
-                <button type="submit" class="btn btn-outline-primary btn-sm"
+                <button type="submit" class="btn btn-outline-primary btn-sm rounded-3 shadow-sm"
                         onclick="return confirm('Xác nhận {{ d.from.username }} đã thanh toán?');">
                   ✅ Đã thanh toán
                 </button>
@@ -217,14 +202,17 @@
       {% endif %}
 
       <div class="text-center mt-4">
-        <a href="{{ url_for('groups.group_list') }}" class="btn btn-outline-secondary">← Quay lại danh sách nhóm</a>
+        <a href="{{ url_for('groups.group_list') }}" class="btn btn-outline-secondary rounded-3 shadow-sm">
+          ← Quay lại danh sách nhóm
+        </a>
       </div>
+
     </div>
 
-    <!-- CỘT PHẢI: DANH SÁCH THÀNH VIÊN -->
+    <!-- CỘT PHẢI: THÀNH VIÊN -->
     <div class="col-lg-3 col-md-4">
-      <div class="card shadow-sm rounded-4 border-0 sticky-top" style="top: 90px;">
-        <div class="card-header bg-success text-white fw-bold text-center">
+      <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 90px;">
+        <div class="card-header bg-success text-white text-center fw-bold rounded-top-4">
           👥 Thành viên nhóm
         </div>
         <div class="card-body p-3">
@@ -233,7 +221,7 @@
               <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                 <div class="d-flex align-items-center">
                   <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="avatar"
-                       class="rounded-circle me-2" width="40" height="40" style="object-fit:cover;">
+                       class="rounded-circle me-2 border border-success border-2" width="42" height="42">
                   <div>
                     <strong>
                       {% if member.id == current_user.id %}
@@ -247,23 +235,18 @@
                     </small><br>
                     {% set bal = member_balances[member.id].balance %}
                     {% if bal > 0 %}
-                      <span class="text-success fw-bold">
-                        +{{ "{:,.0f}".format(bal).replace(",", ".") }} ₫
-                      </span>
+                      <span class="text-success fw-semibold">+{{ "{:,.0f}".format(bal).replace(",", ".") }} ₫</span>
                     {% elif bal < 0 %}
-                      <span class="text-danger fw-bold">
-                        -{{ "{:,.0f}".format(-bal).replace(",", ".") }} ₫
-                      </span>
+                      <span class="text-danger fw-semibold">-{{ "{:,.0f}".format(-bal).replace(",", ".") }} ₫</span>
                     {% else %}
                       <span class="text-secondary">0 ₫</span>
                     {% endif %}
                   </div>
                 </div>
-
                 {% if current_user.id == group.creator_id and member.id != group.creator_id %}
                   <form method="POST" action="{{ url_for('groups.remove_member', group_id=group.id, user_id=member.id) }}" 
                         onsubmit="return confirm('Xóa {{ member.username }} khỏi nhóm?');">
-                    <button class="btn btn-sm btn-outline-danger ms-2">❌</button>
+                    <button class="btn btn-sm btn-outline-danger rounded-circle">❌</button>
                   </form>
                 {% endif %}
               </div>
@@ -272,10 +255,10 @@
             <p class="text-muted text-center mb-0">Chưa có thành viên nào</p>
           {% endif %}
         </div>
-        <div class="card-footer text-center">
+        <div class="card-footer bg-light rounded-bottom-4">
           <form method="POST" action="{{ url_for('groups.add_member', group_id=group.id) }}" class="d-flex">
-            <input type="email" name="email" class="form-control me-2" placeholder="Nhập email mời vào nhóm" required>
-            <button class="btn btn-success">+</button>
+            <input type="email" name="email" class="form-control me-2 rounded-3" placeholder="Nhập email mời vào nhóm" required>
+            <button class="btn btn-success rounded-3">+</button>
           </form>
         </div>
       </div>
